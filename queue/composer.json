@@ -1,0 +1,17 @@
+{
+    "name": "youkeshu/queue",
+    "description": "youkeshu queue",
+    "authors": [
+        {
+            "name": "longli",
+            "email": "1589518286@qq.com"
+        }
+    ],
+     "minimum-stability": "dev",
+    "require": {
+      "predis/predis": "^1.1"
+    },
+    "autoload": {
+        "psr-4": {"queue\\": "src/"}
+    }
+}
