@@ -1,17 +1,11 @@
 {
-    "name": "youkeshu/queue",
-    "description": "youkeshu queue",
+    "name": "chenyouming/queue",
+    "description": "chenyouming",
     "authors": [
         {
-            "name": "longli",
-            "email": "1589518286@qq.com"
+            "name": "Tommy",
+            "email": "77459319@qq.com"
         }
     ],
-     "minimum-stability": "dev",
-    "require": {
-      "predis/predis": "^1.1"
-    },
-    "autoload": {
-        "psr-4": {"queue\\": "src/"}
-    }
+    "require": {}
 }
