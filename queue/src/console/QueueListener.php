@@ -12,9 +12,9 @@ class QueueListener
 {
   /**
    * @var integer
-   * 进程睡眠多少秒
+   * 进程睡眠多少毫秒
    */
-  public $sleep = 1;
+  public $sleep = 100;
 
   /**
    * @var integer
@@ -78,7 +78,7 @@ class QueueListener
       {
         if(!$this->process($queue))
         {
-          sleep($this->sleep);
+          usleep($this->sleep);
         }
       }
     }
@@ -125,7 +125,7 @@ class QueueListener
 
   /**
    * 使用 swoole 运行多进程
-   * @param $queuqName 队列名称
+   * @param string $queuqName 队列名称
    */
   protected function sProcess($queuqName)
   {
@@ -142,7 +142,7 @@ class QueueListener
       {
         while(true)
         {
-          sleep($this->sleep);
+          usleep($this->sleep);
           $this->process($queuqName);
         }
       });

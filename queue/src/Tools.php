@@ -27,4 +27,14 @@ class Tools
         throw new \Exception("配置有误");
     }
   }
+
+  /**
+   * 获取队列配置文件
+   * @return array
+   * @author longli
+   */
+  public static function getConfig()
+  {
+    return require(__DIR__ . '/config.php');
+  }
 }

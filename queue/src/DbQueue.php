@@ -9,7 +9,17 @@ namespace queue;
  */
 class DbQueue implements QueueInterface
 {
-  public $db = 'db';
+  /**
+   * 数据库驱动
+   * @var DbDriver
+   */
+  public $db;
+
+  /**
+   * 配置文件信息
+   * @var array
+   */
+  protected $config = [];
 
   /**
    * 发布超过多少时间重新放入队列，如果为null则不放入
@@ -27,12 +37,9 @@ class DbQueue implements QueueInterface
    */
   public function __construct()
   {
-      $__CONFIG = require (__DIR__ . '/config.php');
-    /**
-     * @var  array $__CONFIG
-     */
-    $this->db = new DbDriver($__CONFIG['db']);
-    $this->db->setTableName($__CONFIG['db']['default']['params']['tableName']);
+    $this->config = require (__DIR__ . '/config.php');
+    $this->db = new DbDriver($this->config['db']);
+    $this->db->setTableName($this->config['db']['default']['params']['tableName']);
     $this->tableName = $this->db->getTableName();
   }
 
@@ -82,6 +89,8 @@ class DbQueue implements QueueInterface
      * @var \PDO $pdo
      */
     $pdo = $this->db->getPdo();
+    if(empty($pdo))
+      return null;
     //准备事务
     try
     {
@@ -103,8 +112,8 @@ class DbQueue implements QueueInterface
       if($pdo != null)
       {
         $pdo->commit();
-        $pdo = null;
       }
+      $pdo = null;
     }
     catch(\PDOException $exception)
     {
@@ -120,12 +129,14 @@ class DbQueue implements QueueInterface
    */
   protected function receiveMessage($queue)
   {
+    $attempts = $this->config['queue']['attempts'];
     $sql = "SELECT * FROM {$this->tableName} WHERE
-           queue=:queue AND reserved=:reserved AND available_at<=:available_at LIMIT 1 for update";
+           queue=:queue AND reserved=:reserved AND available_at<=:available_at AND attempts<=:attempts LIMIT 1 for update";
     $args = [
       ':queue' => $queue,
       ':reserved' => 0,
-      ':available_at' => time()
+      ':available_at' => time(),
+      ':attempts' => $attempts
     ];
     $message = $this->db->query($sql, $args, '', false);
     return !empty($message) ? current($message) : null;
@@ -149,6 +160,7 @@ class DbQueue implements QueueInterface
   public function release(array $message, $delay = 0)
   {
     $sql = "UPDATE {$this->tableName} SET
+    attempts=attempts+1,
     available_at=:available_at,
     reserved=:reserved,
     reserved_at=:reserved_at
