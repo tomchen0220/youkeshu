@@ -7,5 +7,11 @@
             "email": "77459319@qq.com"
         }
     ],
-    "require": {}
+	"minimum-stability": "dev",
+    "require": {
+		"predis/predis": "^1.1"
+	},
+	"autoload": {
+        "psr-4": {"queue\\": "src/"}
+    }
 }
